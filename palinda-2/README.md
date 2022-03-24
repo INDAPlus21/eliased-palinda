@@ -20,5 +20,5 @@ It consumes the data faster, because RandomSleep() is called within each thread,
 ## Can you be sure that all strings are printed before the program stops? 
 No, becausthe all the consumers could be waiting. Say that (by chance) all the producers send their final string to the channel at the same time, but all the consumers are sleeping. wg.Done() is then called by all the producers, and the code continues to close() and exits before the consumers have a chance to read it. I also confirmed this by printing the number of packets consumed vs number produced, and the number consumed was 1 lower sometimes. 
 
-# Notes 
+## Notes 
 (close = not able to receive or send any more values, range pulls values "automatically" until channel is closed, and select acts kinda like a switch)
