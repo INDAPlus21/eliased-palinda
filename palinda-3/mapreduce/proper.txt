@@ -1,0 +1,182 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"strings"
+	"sync"
+	"time"
+	// "strings"y
+)
+
+const DataFile = "loremipsum.txt"
+
+func mäp(text []string, freq_chan chan map[string]int, wg *sync.WaitGroup) {
+	log.Println("in mäp: ")
+	freqs := make(map[string]int)
+	for _, word := range text {
+		// log.Println("adding formatted word")
+		freqs[word] += 1
+	}
+	// log.Println(freqs)
+	// log.Println("in map again!")
+	freq_chan <- freqs
+	// log.Println("doing this") // so it does do this
+	wg.Done()
+	log.Println("done") // so it does do this as well
+}
+
+/*func reduce(ind_word_freq <-chan map[string]int, final_freq chan map[string]int)  {
+	freqs := make(map[string]int)
+	for one_map := range ind_word_freq {
+		for k, v := range one_map {
+			freqs[k] += v
+		}
+	}
+	final_freq <- freqs
+}*/
+
+// Return the word frequencies of the text argument.
+//
+// Split load optimally across processor cores.
+func WordCount(text string) map[string]int {
+
+	word_array := strings.Fields(text)
+	log.Println("length: ", len(word_array))
+	for i, word := range word_array {
+		word = strings.ToLower(word)
+		word = strings.ReplaceAll(word, ".", "")
+		word_array[i] = strings.ReplaceAll(word, ",", "")
+	}
+
+	size := len(word_array)/10
+	freq_chan := make(chan map[string]int, 100) // Make room for one unmatched send.
+	// two buffers was the key
+	// final_freq := make(chan map[string]int)
+
+	wg := new(sync.WaitGroup)
+
+	// log.Println("length: ", len(word_array))
+	// part_size := len(word_array)/10
+	// log.Println("part size", part_size)
+	var i int
+	for i = 0; i*size < len(word_array); i++ {
+		log.Println(i,)
+		wg.Add(1)
+		var text_part []string
+		if (i+1)*size < len(word_array) {
+			text_part = word_array[i*size : (i+1)*size]
+		} else {
+			text_part = word_array[i*size:]
+		}
+		log.Println("text part: ", len(text_part))
+		// go mäp(text_part, freq_chan, wg)
+		go func(text_part []string) {
+			log.Println("in mäp: ")
+			freqs := make(map[string]int)
+			for _, word := range text_part {
+				// log.Println("adding formatted word")
+				freqs[word] += 1
+			}
+			// log.Println(freqs)
+			// log.Println("in map again!")
+			freq_chan <- freqs
+			// log.Println("doing this") // so it does do this
+			wg.Done()
+			log.Println("done") // so it does do this as well
+		}(text_part)
+	}
+	log.Println("i: ", i, i*size, len(word_array))
+
+	// final_freq <- freqs
+	// go reduce(freq_chan, final_freq)
+	// close(freq_chan)
+	// log.Println("in after wait")
+
+	// wg.Add(1)
+	wg.Wait()
+	close(freq_chan)
+
+	/*
+		From the web: After all the mappers complete processing,
+		the framework shuffles and sorts the results before passing them on to the reducers.
+		A reducer cannot start while a mapper is still in progress. All the map output values that have the same key are
+		assigned to a single reducer, which then aggregates the values for that key.
+	*/
+
+	freqs := make(map[string]int)
+
+	log.Println("in go func")
+	for one_map := range freq_chan {
+		// log.Println("one map: ", one_map)
+		for k, v := range one_map {
+			// log.Println("in adding to freqs")
+			freqs[k] += v
+		}
+	}
+
+	// ok. so the values aren't removed from the map
+	/* go func() {
+		log.Println("in go func")
+		for one_map := range freq_chan {
+			// log.Println("one map: ", one_map)
+			for k, v := range one_map {
+				// log.Println("in adding to freqs")
+				freqs[k] += v
+			}
+		}
+		/* for one_map := range freq_chan {
+			log.Println("one map: ", one_map)
+			for k, v := range one_map {
+				// log.Println("in adding to freqs")
+				freqs[k] += v
+			}
+		} 
+		// log.Println(freqs)
+		// wg.Done()
+	}() */
+
+	return freqs
+}
+
+// Benchmark how long it takes to count word frequencies in text numRuns times.
+//
+// Return the total time elapsed.
+func benchmark(text string, numRuns int) int64 {
+	start := time.Now()
+	for i := 0; i < numRuns; i++ {
+		WordCount(text)
+	}
+	runtimeMillis := time.Since(start).Nanoseconds() / 1e6
+
+	return runtimeMillis
+}
+
+// Print the results of a benchmark
+func printResults(runtimeMillis int64, numRuns int) {
+	fmt.Printf("amount of runs: %d\n", numRuns)
+	fmt.Printf("total time: %d ms\n", runtimeMillis)
+	average := float64(runtimeMillis) / float64(numRuns)
+	fmt.Printf("average time/run: %.2f ms\n", average)
+}
+
+func main() {
+	// read in DataFile as a string called data
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	data, err := ioutil.ReadFile(DataFile)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	// log.Println(string(data))
+
+	log.Println("word count: ", WordCount(string(data)))
+
+	// every OTHER time it works (!!!)
+
+	/* numRuns := 100
+	runtimeMillis := benchmark(string(data), numRuns)
+	printResults(runtimeMillis, numRuns) */
+}
