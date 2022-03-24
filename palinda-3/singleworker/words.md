@@ -1,4 +1,4 @@
-# Instructions
+## Instructions
 ✓ Implementation for the WordCount function 
 ✓ Reading a text file into a string in the main function  
 ✓ Check that the unittest passes
@@ -8,7 +8,6 @@
 ✓ Check that the unittest passes
 ✓ Find the optimal amount of gorountines before you encounter diminishing returns in performance improvements
 ✓ Log the runtime performance in the table below
-
 
 | Variant      | Runtime (ms)       |
 | ------------ | ------------:      |

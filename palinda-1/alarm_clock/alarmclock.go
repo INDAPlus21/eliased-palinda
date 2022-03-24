@@ -18,3 +18,5 @@ func main() {
 	go Remind("Time to work", 30*time.Second)
 	Remind("Time to sleep", 60*time.Second)
 }
+
+// run with go test *.go 

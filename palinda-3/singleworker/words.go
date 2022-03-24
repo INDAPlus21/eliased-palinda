@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 	"log"
-	// "os"
 	"io/ioutil"
 	"strings"
 )
@@ -15,17 +14,13 @@ const DataFile = "loremipsum.txt"
 func WordCount(text string) map[string]int {
 	freqs := make(map[string]int)
 	words := strings.Fields(text)
+
 	for _, word := range words {
 		formatted_word := strings.ToLower(strings.ReplaceAll(word, ".", ""))
 		formatted_word = strings.ReplaceAll(formatted_word, ",", "")
 		freqs[formatted_word] += 1
 	}
 
-	/* for word := range(text) {
-		freqs[word] += 1
-	} */
-	// log.Println(freqs)
-	// ...
 	return freqs
 }
 
@@ -56,12 +51,6 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	/* data, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Println(err.Error())
-	} */
-
-	log.Println(string(data))
 
 	log.Println("word count: ", WordCount(string(data)))
 

@@ -9,4 +9,3 @@ func main() {
 	fmt.Println(<-ch)
 }
 
-// Explanation: the channel was unbuffered, and I made it buffered a

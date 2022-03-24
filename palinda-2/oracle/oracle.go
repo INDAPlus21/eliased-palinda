@@ -12,15 +12,6 @@ import (
 	"time"
 )
 
-/* 
-Your program should contain two channels: One channel for questions, and one for answers and predictions. 
-In the Oracle function you should start three indefinite go-routines.
-
-A go-routine that receives all questions, and for each incoming question, creates a separate go-routine that answers that question
-A go-routine that generates predictions
-A go-routine that receives all answers and predictions, and prints then to stdout
-*/ 
-
 const (
 	star   = "Pythia"
 	venue  = "Delphi"
@@ -90,7 +81,6 @@ func Oracle() chan<- string {
 
 // This is the oracle's secret algorithm.
 // It waits for a while and then sends a message on the answer channel.
-// TODO: make it better.
 func prophecy(question string, answer chan<- string) {
 	// Keep them waiting. Pythia, the original oracle at Delphi,
 	// only gave prophecies on the seventh day of each month.

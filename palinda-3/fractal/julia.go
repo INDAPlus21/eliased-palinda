@@ -49,13 +49,6 @@ func main() {
 		}()
 	}
 	wg.Wait()
-	/*for n, fn := range Funcs {
-		err := CreatePng("picture-"+strconv.Itoa(n)+".png", fn, 1024)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(time.Since(start))
-	}*/
 }
 
 // CreatePng creates a PNG picture file with a Julia image of size n x n.
@@ -74,15 +67,7 @@ func Julia(f ComplexFunc, n int) image.Image {
 	bounds := image.Rect(-n/2, -n/2, n/2, n/2)
 	img := image.NewRGBA(bounds)
 	s := float64(n / 4)
-	/* for i := bounds.Min.X; i < bounds.Max.X; i++ {
-		for j := bounds.Min.Y; j < bounds.Max.Y; j++ {
-			n := Iterate(f, complex(float64(i)/s, float64(j)/s), 256)
-			r := uint8(0)
-			g := uint8(0)
-			b := uint8(n % 32 * 8)
-			img.Set(i, j, color.RGBA{r, g, b, 255})
-		}
-	} */
+
 	var wg sync.WaitGroup
 	for i := bounds.Min.X; i < bounds.Max.X; i++ {
 		wg.Add(1)
