@@ -59,7 +59,7 @@ func Oracle() chan<- string {
 	// receive all questions 
 	go func() {
 		for question := range questions {
-			fmt.Println("received", question)
+			// fmt.Println("received", question)
 			go prophecy(question, answers)
 			// RandomSleep(100) // Simulate time to consume data.
 		}
@@ -67,12 +67,19 @@ func Oracle() chan<- string {
 	go func() {
 		for {
 			RandomSleep(10000) // Simulate time to consume data.
-			fmt.Println("This is a random prediction")
+			switch rand.Intn(3) {
+			case 0:
+				answers <- "The one with the power to vanquish the Dark Lord approaches... Born to those who have thrice defied him, born as the seventh month dies... and the Dark Lord will mark him as his equal, but he will have power the Dark Lord knows not... and either must die at the hand of the other for neither can live while the other survives... The one with the power to vanquish the Dark Lord will be born as the seventh month dies..."
+			case 1:
+				answers <- "It will happen tonight. The Dark Lord lies alone and friendless, abandoned by his followers. His servant has been chained these twelve years. Tonight, before midnight... the servant will break free and set out to rejoin his master. The Dark Lord will rise again with his servant's aid, greater and more terrible than ever he was. Tonight... before midnight... the servant... will set out... to rejoin... his master..."
+			case 2:
+				answers <- "The Grim, my dear, the Grim!’ cried Professor Trelawney, who looked shocked that Harry hadn’t understood. ‘The giant, spectral dog that haunts churchyards! My dear boy, it is an omen – the worst omen – of death!"
+			}
 		}
 	}()
 	go func() {
 		for answer := range answers {
-			fmt.Println("received", answer)
+			fmt.Println(answer)
 		}
 	}()
 	// TODO: Answer questions.
@@ -99,13 +106,7 @@ func prophecy(question string, answer chan<- string) {
 		}
 	}
 
-	// Cook up some pointless nonsense.
-	/* 	nonsense := []string{
-
-		// "The moon is dark.",
-		// "The sun is bright.",
-	} */
-	answer <- longestWord + "..." + longestWord + "are indeed. " // + nonsense[rand.Intn(len(nonsense))]
+	answer <- (longestWord + "... " + longestWord + " indeed...") // + nonsense[rand.Intn(len(nonsense))]
 }
 
 func init() { // Functions called "init" are executed before the main function.
