@@ -17,7 +17,7 @@ func main() {
 	wg := new(sync.WaitGroup)
 	wg.Add(len(people))
 	for _, name := range people {
-		// log.Println("in range loop")
+		log.Println("in range loop")
 		go Seek(name, match, wg)
 	}
 	wg.Wait()
